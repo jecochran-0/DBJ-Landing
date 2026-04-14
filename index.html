@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Designed By Jake — AI Patient Systems for Dental Practices</title>
+<meta name="description" content="24/7 AI receptionist, appointment booking, and review generation for dental practices. Never miss a patient again.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300;0,8..60,400;0,8..60,600;1,8..60,300;1,8..60,400&family=General+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#ffffff;
+  --bg-soft:#f6f9fc;
+  --border:#e3e8ef;
+  --text:#0a2540;
+  --text-sec:#425466;
+  --text-dim:#6b7c93;
+  --accent:#535bd6;
+  --accent-hover:#454cc4;
+  --accent-light:#eef0fb;
+  --green:#0da678;
+  --green-light:#e6f7f1;
+  --orange:#f59e0b;
+  --serif:'Source Serif 4',Georgia,serif;
+  --sans:'General Sans',-apple-system,system-ui,sans-serif;
+  --max-w:1100px;
+  --radius:16px;
+}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);line-height:1.6;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+::selection{background:var(--accent-light);color:var(--accent)}
+
+/* NAV — Stripe-style floating island (in document flow, not sticky) */
+.nav-wrap{
+  position:relative;
+  z-index:100;
+  padding:24px clamp(20px,4vw,40px) 64px;
+}
+.nav{
+  max-width:var(--max-w);
+  margin:0 auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  padding:14px 24px;
+  background:#fff;
+  border:1px solid rgba(10,37,64,.08);
+  border-radius:12px;
+  box-shadow:
+    0 18px 50px -20px rgba(15,23,42,.14),
+    0 2px 10px -3px rgba(15,23,42,.08);
+}
+.nav-logo{flex-shrink:0}
+.nav-logo img{height:100px;width:auto;max-height:100px;object-fit:contain;display:block}
+.nav-links{display:flex;align-items:center;gap:32px;flex-shrink:0}
+.nav-links a{font-size:15px;font-weight:500;color:var(--text-sec);transition:color .2s}
+.nav-links a:hover{color:var(--text)}
+/* Specificity above .nav-links a so label stays white on blue */
+.nav-links a.nav-cta{font-size:14px;font-weight:600;padding:10px 22px;border-radius:8px;background:var(--accent);color:#fff;transition:background .2s,color .2s}
+.nav-links a.nav-cta:hover{color:#fff;background:var(--accent-hover)}
+@media(max-width:768px){
+  .nav-wrap{padding:18px 20px 48px}
+  .nav{padding:12px 16px;border-radius:10px;gap:12px}
+  .nav-logo img{height:100px;max-height:100px}
+  .nav-links{gap:16px}
+  .nav-links a.hide-mobile{display:none}
+}
+
+/* LAYOUT */
+section{padding:96px 40px}
+.container{max-width:var(--max-w);margin:0 auto}
+.section-label{display:none}
+@media(max-width:768px){section{padding:72px 20px}}
+
+/* BUTTONS */
+.btn-primary{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:16px;font-weight:600;padding:14px 32px;border-radius:8px;background:var(--accent);color:#fff;border:none;cursor:pointer;transition:all .2s}
+.btn-primary:hover{background:var(--accent-hover);transform:translateY(-1px);box-shadow:0 4px 20px rgba(83,91,214,.25)}
+.btn-primary svg{transition:transform .2s}
+.btn-primary:hover svg{transform:translateX(3px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:8px;font-family:var(--sans);font-size:16px;font-weight:500;padding:14px 32px;border-radius:8px;color:var(--text-sec);border:none;cursor:pointer;background:transparent;transition:color .2s}
+.btn-ghost:hover{color:var(--accent)}
+
+/* HERO — Stripe-like mesh: large stage + mask = diagonal ribbon, copy stays on clean side */
+.hero{padding:88px 40px 120px;position:relative;overflow:hidden;background:var(--bg)}
+.hero-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.hero-gradient-blob{
+  position:absolute;
+  width:min(165vw,2100px);
+  height:min(155vh,1600px);
+  top:-32%;
+  right:-42%;
+  transform:rotate(-13deg);
+  transform-origin:45% 45%;
+  -webkit-mask-image:radial-gradient(ellipse 58% 62% at 52% 46%,#000 0%,#000 32%,rgba(0,0,0,.45) 52%,transparent 74%);
+  mask-image:radial-gradient(ellipse 58% 62% at 52% 46%,#000 0%,#000 32%,rgba(0,0,0,.45) 52%,transparent 74%);
+}
+.stripe-gradient-canvas{width:100%;height:100%;display:block;--gradient-color-1:#4f6cf5;--gradient-color-2:#6366f1;--gradient-color-3:#22d3ee;--gradient-color-4:#818cf8}
+.hero-bg-scrim{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(105deg,rgba(255,255,255,.97) 0%,rgba(255,255,255,.78) 22%,rgba(255,255,255,.35) 48%,rgba(255,255,255,.08) 68%,transparent 100%);
+}
+.hero .container{max-width:900px;position:relative;z-index:1}
+.hero h1{font-family:var(--serif);font-weight:600;font-size:clamp(48px,6.5vw,84px);line-height:1.06;letter-spacing:-.035em;margin-bottom:32px;text-shadow:0 0 40px rgba(255,255,255,.85),0 1px 0 rgba(255,255,255,.6)}
+.hero h1 .dim{color:var(--text-sec)}
+.hero p{font-size:clamp(18px,2vw,21px);color:var(--text-sec);line-height:1.7;max-width:540px;margin-bottom:48px;text-shadow:0 0 28px rgba(255,255,255,.9)}
+.hero-ctas{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+@media(max-width:768px){
+  .hero{padding:64px 20px 80px}
+  .hero-ctas{flex-direction:column;align-items:flex-start}
+  .hero-gradient-blob{top:-38%;right:-48%;width:190vw;height:130vh;transform:rotate(-10deg)}
+}
+
+/* BENTO — same mesh treatment behind glass cards */
+.bento-section{position:relative;overflow:hidden;background:var(--bg);padding:96px 40px}
+.bento-bg{position:absolute;inset:0;z-index:0;pointer-events:none}
+.bento-gradient-blob{
+  position:absolute;
+  width:min(150vw,1900px);
+  height:min(120vw,1100px);
+  bottom:-48%;
+  left:-45%;
+  transform:rotate(11deg);
+  transform-origin:42% 58%;
+  -webkit-mask-image:radial-gradient(ellipse 62% 66% at 48% 40%,#000 0%,#000 30%,rgba(0,0,0,.4) 52%,transparent 76%);
+  mask-image:radial-gradient(ellipse 62% 66% at 48% 40%,#000 0%,#000 30%,rgba(0,0,0,.4) 52%,transparent 76%);
+}
+.bento-bg-scrim{
+  position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(185deg,rgba(255,255,255,.92) 0%,rgba(255,255,255,.55) 40%,rgba(255,255,255,.82) 100%);
+}
+.bento-section-inner{position:relative;z-index:1}
+.bento-header{text-align:center;margin-bottom:56px}
+.bento-header h2{font-family:var(--serif);font-size:clamp(30px,4vw,48px);font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:12px;color:var(--text);text-shadow:0 0 32px rgba(255,255,255,.75)}
+.bento-header p{font-size:18px;color:var(--text-sec);max-width:520px;margin:0 auto;text-shadow:0 0 24px rgba(255,255,255,.85)}
+/* Slightly wider right stack (3rd track) so chat image isn’t lost in a very wide cell; chatbot still spans first two tracks */
+.bento{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1.34fr);grid-template-rows:auto auto auto;gap:16px;max-width:var(--max-w);margin:0 auto}
+/* Feature cards: Stripe-like diagonal color bands + narrow highlight streaks (no dots, no soft blots) */
+.bento-card{
+  position:relative;
+  isolation:isolate;
+  border:1px solid rgba(227,232,239,.95);
+  border-radius:var(--radius);
+  overflow:hidden;
+  padding:32px;
+  transition:box-shadow .35s cubic-bezier(.16,1,.3,1),transform .35s cubic-bezier(.16,1,.3,1),border-color .25s;
+  background-color:#f9fbff;
+  background-image:
+    linear-gradient(121deg,transparent 46%,rgba(255,255,255,.92) 49.4%,rgba(255,255,255,.22) 50.2%,transparent 51.2%),
+    linear-gradient(116deg,transparent 43%,rgba(37,99,235,0.16) 49.2%,rgba(59,130,246,0.32) 50.4%,rgba(99,102,241,0.24) 51.6%,rgba(14,165,233,0.14) 52.8%,transparent 58%),
+    linear-gradient(158deg,transparent 22%,rgba(79,70,229,0.09) 36%,transparent 48%),
+    conic-gradient(from 228deg at 100% 0%,transparent 0deg,rgba(14,165,233,0.14) 38deg,transparent 62deg),
+    conic-gradient(from 52deg at 0% 100%,transparent 0deg,rgba(59,130,246,0.1) 42deg,transparent 64deg);
+  backdrop-filter:saturate(168%) blur(14px);
+  -webkit-backdrop-filter:saturate(168%) blur(14px);
+}
+.bento-card:hover{box-shadow:0 16px 48px rgba(37,99,235,.1);transform:translateY(-3px);border-color:rgba(83,91,214,.28)}
+.bento-card > *{position:relative;z-index:1}
+.bento-card h3{font-size:18px;font-weight:600;margin-bottom:6px;color:var(--text);padding-right:44px}
+.bento-card .card-desc{font-size:14px;color:var(--text-sec);line-height:1.6;margin-bottom:20px}
+.bento-card-expand{
+  position:absolute;
+  top:14px;
+  right:14px;
+  z-index:5;
+  width:38px;
+  height:38px;
+  border-radius:10px;
+  border:1px solid rgba(15,23,42,.08);
+  background:rgba(255,255,255,.88);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  color:var(--text-dim);
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:color .2s,border-color .2s,background .2s,transform .35s cubic-bezier(.16,1,.3,1),box-shadow .2s
+}
+.bento-card-expand:hover{color:var(--accent);border-color:rgba(83,91,214,.35);background:#fff;box-shadow:0 4px 16px rgba(83,91,214,.12)}
+.bento-card-expand:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.bento-card-expand svg{width:18px;height:18px}
+.bento-card.is-expanded .bento-card-expand{color:var(--accent);border-color:rgba(83,91,214,.4);transform:rotate(180deg)}
+@media(prefers-reduced-motion:reduce){
+  .bento-card,.bento-card-more,.bento-card-expand{transition-duration:.01ms!important}
+  .card-booking,.card-reviews,.card-intake{animation:none!important}
+}
+/* Slow drift of layered gradients (wispy bands stay sharp; motion via oversized tiles + position) */
+@keyframes stripe-drift-booking{
+  0%{background-position:0% 34%,18% 54%,72% 76%,center bottom}
+  100%{background-position:14% 26%,4% 62%,48% 90%,center bottom}
+}
+@keyframes stripe-drift-reviews{
+  0%{background-position:6% 42%,22% 48%,68% 78%,center top}
+  100%{background-position:16% 34%,8% 58%,54% 88%,center top}
+}
+@keyframes stripe-drift-intake{
+  0%{background-position:4% 28%,28% 44%,62% 70%,center bottom}
+  100%{background-position:18% 20%,12% 54%,48% 84%,center bottom}
+}
+.bento-card-more{
+  max-height:0;
+  opacity:0;
+  overflow:hidden;
+  transition:max-height .5s cubic-bezier(.16,1,.3,1),opacity .35s ease,padding .35s ease;
+  padding:0 0 0 0;
+  border-top:1px solid transparent;
+}
+.bento-card.is-expanded .bento-card-more{
+  max-height:280px;
+  opacity:1;
+  padding-top:16px;
+  padding-bottom:20px;
+  margin-top:4px;
+  border-top-color:rgba(227,232,239,.9)
+}
+.bento-card-more p{font-size:14px;color:var(--text-sec);line-height:1.65;margin:0}
+.card-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+.card-icon svg{width:20px;height:20px}
+
+.card-chatbot{
+  grid-column:1/3;grid-row:1/3;padding:0;display:flex;flex-direction:column;
+  background-color:#fdfefe;
+  background-image:
+    linear-gradient(118deg,transparent 58%,rgba(59,130,246,0.07) 66%,transparent 74%),
+    linear-gradient(108deg,transparent 62%,rgba(99,102,241,0.06) 70%,transparent 78%),
+    linear-gradient(92deg,transparent 0%,rgba(255,255,255,.75) 10%,transparent 22%);
+}
+.card-chatbot .card-text{padding:32px 32px 0}
+.card-chatbot .card-img{flex:1;margin-top:20px;overflow:hidden}
+.card-chatbot .card-img img,
+.card-chatbot .card-img video{width:100%;height:100%;object-fit:contain;object-position:center bottom;display:block;background:#0f172a}
+.card-chatbot .card-img video{vertical-align:bottom}
+.card-chatbot h3{padding-right:48px}
+.card-chatbot .bento-card-more{padding-left:32px;padding-right:32px}
+.card-booking{
+  grid-column:3/4;grid-row:1/2;
+  background-color:#f8fbff;
+  background-image:
+    linear-gradient(132deg,transparent 54%,rgba(255,255,255,.9) 61%,rgba(255,255,255,.2) 62.5%,transparent 64%),
+    linear-gradient(106deg,transparent 34%,rgba(14,165,233,0.18) 44%,rgba(59,130,246,0.34) 47.5%,rgba(37,99,235,0.22) 50%,transparent 58%),
+    linear-gradient(172deg,transparent 62%,rgba(99,102,241,0.1) 78%,transparent 92%),
+    conic-gradient(from 195deg at 0% 100%,transparent 0deg,rgba(14,165,233,0.12) 36deg,transparent 56deg);
+  background-size:220% 220%,200% 200%,240% 240%,auto;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
+  background-position:0% 34%,18% 54%,72% 76%,center bottom;
+  animation:stripe-drift-booking 22s ease-in-out infinite alternate;
+  will-change:background-position;
+}
+.card-reviews{
+  grid-column:3/4;grid-row:2/3;
+  background-color:#fffbf9;
+  background-image:
+    linear-gradient(118deg,transparent 50%,rgba(255,255,255,.88) 53.8%,rgba(255,255,255,.15) 54.6%,transparent 55.8%),
+    linear-gradient(124deg,transparent 30%,rgba(251,191,36,0.14) 40%,rgba(59,130,246,0.2) 48%,rgba(99,102,241,0.28) 52%,rgba(59,130,246,0.16) 56%,transparent 66%),
+    linear-gradient(12deg,transparent 72%,rgba(245,158,11,0.08) 86%,transparent 96%),
+    conic-gradient(from 250deg at 100% 20%,transparent 0deg,rgba(99,102,241,0.1) 48deg,transparent 70deg);
+  background-size:210% 210%,195% 195%,230% 230%,auto;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
+  background-position:6% 42%,22% 48%,68% 78%,center top;
+  animation:stripe-drift-reviews 26s ease-in-out infinite alternate;
+  will-change:background-position;
+}
+.card-leads{
+  grid-column:1/2;grid-row:3/4;
+  background-color:#fdfefe;
+  background-image:
+    linear-gradient(110deg,transparent 48%,rgba(6,182,212,0.06) 56%,rgba(59,130,246,0.08) 60%,transparent 68%),
+    linear-gradient(-20deg,transparent 76%,rgba(14,165,233,0.05) 86%,transparent 94%);
+}
+.card-intake{
+  grid-column:2/4;grid-row:3/4;
+  background-color:#faf8ff;
+  background-image:
+    linear-gradient(120deg,transparent 20%,rgba(255,255,255,.9) 32%,transparent 36%),
+    linear-gradient(117deg,transparent 36%,rgba(129,140,248,0.2) 44%,rgba(99,102,241,0.26) 47%,rgba(59,130,246,0.24) 50%,rgba(14,165,233,0.14) 53%,transparent 62%),
+    linear-gradient(94deg,transparent 58%,rgba(255,255,255,.72) 63.5%,transparent 67%),
+    conic-gradient(from 38deg at 100% 85%,transparent 0deg,rgba(79,70,229,0.11) 50deg,transparent 72deg);
+  background-size:200% 200%,185% 185%,215% 215%,auto;
+  background-repeat:no-repeat,no-repeat,no-repeat,no-repeat;
+  background-position:4% 28%,28% 44%,62% 70%,center bottom;
+  animation:stripe-drift-intake 20s ease-in-out infinite alternate;
+  will-change:background-position;
+}
+
+@media(max-width:900px){
+  .bento{grid-template-columns:1fr}
+  .card-chatbot,.card-booking,.card-reviews,.card-leads,.card-intake{grid-column:1;grid-row:auto}
+  .card-chatbot .card-img{height:280px}
+}
+@media(max-width:768px){
+  .bento-section{padding:72px 20px}
+  .bento-gradient-blob{bottom:-52%;left:-55%;width:175vw}
+}
+
+/* Calendar mockup */
+.mock-cal{background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;font-size:13px}
+.mock-cal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;font-weight:600;font-size:14px;color:var(--text)}
+.mock-cal-header span{color:var(--text-dim);font-weight:400;font-size:12px}
+.mock-cal-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.mock-cal-slot{padding:8px 4px;border-radius:8px;text-align:center;font-size:12px;font-weight:500;background:var(--bg-soft);color:var(--text-sec);border:1px solid transparent}
+.mock-cal-slot.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mock-cal-slot.taken{background:#fff;color:var(--text-dim);text-decoration:line-through;opacity:.5}
+.mock-cal-patient{margin-top:14px;padding:12px;background:var(--accent-light);border-radius:10px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--accent);font-weight:500}
+.mock-cal-patient .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+
+/* Reviews mockup */
+.mock-reviews{background:#fff;border-radius:12px;border:1px solid var(--border);padding:20px}
+.review-stats{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
+.review-num{font-size:36px;font-weight:700;font-family:var(--serif);letter-spacing:-.02em;color:var(--text)}
+.review-change{font-size:13px;font-weight:600;color:var(--green);background:var(--green-light);padding:3px 10px;border-radius:100px}
+.review-stars{display:flex;gap:2px;margin-bottom:14px;align-items:center}
+.review-bar-group{display:flex;flex-direction:column;gap:5px}
+.review-bar-row{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--text-dim)}
+.review-bar-row span:first-child{width:12px;text-align:right}
+.review-bar{flex:1;height:6px;background:#edf0f4;border-radius:3px;overflow:hidden}
+.review-bar-fill{height:100%;border-radius:3px;background:var(--orange)}
+.review-card{margin-top:14px;padding:12px;background:var(--bg-soft);border-radius:10px;font-size:12px;color:var(--text-sec);line-height:1.5}
+.review-card strong{color:var(--text);font-weight:600;display:block;margin-bottom:2px}
+
+/* Lead mockup */
+.mock-lead{display:flex;flex-direction:column;gap:10px}
+.lead-notif{background:#fff;border-radius:12px;border:1px solid var(--border);padding:14px 16px;display:flex;align-items:flex-start;gap:12px}
+.lead-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.lead-icon svg{width:18px;height:18px}
+.lead-icon.sms{background:#dbeafe}
+.lead-icon.email{background:#fce7f3}
+.lead-icon.confirm{background:var(--green-light)}
+.lead-body .lead-title{font-size:13px;font-weight:600;margin-bottom:2px;color:var(--text)}
+.lead-body .lead-text{font-size:12px;color:var(--text-sec);line-height:1.5}
+.lead-body .lead-time{font-size:11px;color:var(--text-dim);margin-top:4px}
+
+/* Intake mockup */
+.mock-intake{display:flex;gap:16px;align-items:flex-start}
+.intake-chat{flex:1;background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px;display:flex;flex-direction:column;gap:10px}
+.intake-msg{max-width:85%;padding:10px 14px;border-radius:14px;font-size:13px;line-height:1.5}
+.intake-msg.bot{background:var(--bg-soft);color:var(--text);border-bottom-left-radius:4px;align-self:flex-start}
+.intake-msg.user{background:var(--accent);color:#fff;border-bottom-right-radius:4px;align-self:flex-end}
+.intake-progress{flex:0 0 140px;background:#fff;border-radius:12px;border:1px solid var(--border);padding:16px}
+.intake-progress h4{font-size:11px;font-weight:600;margin-bottom:12px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.06em}
+.intake-step{display:flex;align-items:center;gap:8px;font-size:12px;margin-bottom:10px;color:var(--text-sec)}
+.intake-step .check{width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:10px}
+.intake-step .check.done{background:var(--green);color:#fff}
+.intake-step .check.current{background:var(--accent);color:#fff}
+.intake-step .check.pending{background:var(--bg-soft);border:1.5px solid var(--border)}
+@media(max-width:600px){.mock-intake{flex-direction:column}.intake-progress{flex:none;width:100%}}
+
+/* PRICING */
+.pricing{background:var(--bg-soft)}
+.pricing .container{max-width:800px}
+.pricing h2{font-family:var(--serif);font-size:clamp(30px,4vw,48px);font-weight:600;line-height:1.15;letter-spacing:-.02em;margin-bottom:16px;color:var(--text)}
+.pricing .sub{font-size:18px;color:var(--text-sec);margin-bottom:56px;max-width:520px}
+.tiers{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px}
+.tier{padding:36px 32px;border-radius:var(--radius);background:var(--bg);border:1px solid var(--border);position:relative;transition:box-shadow .3s}
+.tier:hover{box-shadow:0 8px 32px rgba(10,37,64,.06)}
+.tier.featured{border:2px solid var(--accent)}
+.tier.featured::before{content:'Recommended';position:absolute;top:-12px;left:24px;font-size:12px;font-weight:600;padding:4px 14px;border-radius:6px;background:var(--accent);color:#fff}
+.tier h3{font-size:20px;font-weight:600;margin-bottom:4px;color:var(--text)}
+.tier .desc{font-size:14px;color:var(--text-dim);margin-bottom:24px}
+.tier .price{font-family:var(--serif);font-size:42px;font-weight:600;letter-spacing:-.03em;color:var(--text)}
+.tier .price span{font-size:16px;font-family:var(--sans);color:var(--text-dim);font-weight:400}
+.tier .recur{font-size:14px;color:var(--text-dim);margin-bottom:28px}
+.tier ul{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+.tier li{font-size:14px;color:var(--text-sec);display:flex;align-items:flex-start;gap:10px;line-height:1.5}
+.ck{width:16px;height:16px;flex-shrink:0;margin-top:2px;color:var(--green)}
+.tier-btn{display:block;text-align:center;font-family:var(--sans);font-size:15px;font-weight:600;padding:14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:var(--text);cursor:pointer;transition:all .2s;width:100%}
+.tier-btn:hover{border-color:var(--accent);color:var(--accent)}
+.tier.featured .tier-btn{background:var(--accent);color:#fff;border-color:var(--accent)}
+.tier.featured .tier-btn:hover{background:var(--accent-hover)}
+
+/* THE MATH — two minimalist variants for live comparison */
+.math-section{background:var(--bg-soft)}
+.math-section .container{max-width:860px}
+.math-variants{display:grid;gap:32px;margin-top:20px}
+.math-variant{padding:22px 0}
+.math-rows{border-top:1px solid rgba(10,37,64,.12)}
+.math-row{
+  display:grid;
+  grid-template-columns:minmax(130px,180px) 1fr;
+  gap:18px;
+  align-items:center;
+  padding:18px 0;
+  border-bottom:1px solid rgba(10,37,64,.12)
+}
+.math-value{
+  font-family:var(--serif);
+  font-size:clamp(36px,4.6vw,52px);
+  line-height:1;
+  letter-spacing:-.03em;
+  color:var(--text)
+}
+.math-copy{
+  font-size:16px;
+  color:var(--text-sec);
+  line-height:1.55;
+  max-width:520px
+}
+@media(max-width:768px){
+  .math-row{grid-template-columns:1fr;gap:10px}
+}
+
+/* TESTIMONIALS — minimal stack; color shifts to accent after scroll passes (see script) */
+.testimonials{background:var(--bg);border-block:1px solid rgba(227,232,239,.6)}
+.testimonials .container{max-width:min(42rem,100%)}
+.testimonials-head{margin-bottom:clamp(2.5rem,6vw,3.5rem)}
+.testimonials-head .section-label{text-align:left;margin-bottom:10px}
+.testimonials-head h2{
+  font-family:var(--serif);font-size:clamp(1.75rem,4vw,2.25rem);font-weight:600;line-height:1.2;letter-spacing:-.02em;color:var(--text);
+  text-align:left;margin:0
+}
+.testimonials-stack{display:flex;flex-direction:column;gap:clamp(2.75rem,7vw,4.25rem)}
+.testimonial-quote{
+  margin:0;padding:0;border:none;
+  border-top:1px solid rgba(227,232,239,.75);
+  padding-top:clamp(2rem,5vw,2.75rem)
+}
+.testimonial-quote:first-of-type{border-top:none;padding-top:0}
+.testimonial-quote p{
+  font-family:var(--serif);font-size:clamp(1.35rem,3.2vw,2.1rem);font-weight:500;font-style:normal;line-height:1.35;letter-spacing:-.02em;
+  color:var(--text);margin:0 0 1rem
+}
+.testimonial-quote cite{
+  font-family:var(--sans);font-size:clamp(0.95rem,1.8vw,1.05rem);font-weight:600;font-style:normal;color:var(--text-dim);
+  display:block;letter-spacing:.01em
+}
+.testimonial-char{
+  color:inherit;
+  transition:color .55s cubic-bezier(.25,.46,.45,.94)
+}
+.testimonial-quote--past p .testimonial-char,
+.testimonial-quote--past cite .testimonial-char{color:var(--accent)}
+@media(prefers-reduced-motion:reduce){
+  .testimonial-char{transition-duration:.01ms!important}
+}
+
+/* GUARANTEE */
+.guarantee{text-align:center}
+.guarantee h2{font-family:var(--serif);font-size:clamp(28px,3.5vw,44px);font-weight:600;line-height:1.2;letter-spacing:-.02em;margin-bottom:20px;max-width:580px;margin-left:auto;margin-right:auto;color:var(--text)}
+.guarantee p{font-size:17px;color:var(--text-sec);line-height:1.75;max-width:520px;margin:0 auto}
+
+/* FINAL CTA */
+.final-cta{text-align:center;padding:96px 40px}
+.final-cta h2{font-family:var(--serif);font-size:clamp(34px,5vw,56px);font-weight:600;line-height:1.12;letter-spacing:-.03em;margin-bottom:20px;max-width:640px;margin-left:auto;margin-right:auto;color:var(--text)}
+.final-cta p{font-size:18px;color:var(--text-sec);margin-bottom:40px;max-width:460px;margin-left:auto;margin-right:auto;line-height:1.7}
+
+/* FOOTER */
+.footer{padding:48px 40px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:20px}
+.footer p{font-size:13px;color:var(--text-dim)}
+.footer-links{display:flex;align-items:center;flex-wrap:wrap;gap:20px}
+.footer a{font-size:13px;color:var(--text-dim);transition:color .2s}
+.footer a:hover{color:var(--text)}
+.footer-li{display:inline-flex;align-items:center;justify-content:center;color:var(--text-dim);transition:color .2s}
+.footer-li:hover{color:#0a66c2}
+.footer-li svg{width:22px;height:22px;display:block}
+
+/* FADE */
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1)}
+.fade-in.visible{opacity:1;transform:translateY(0)}
+
+@media(max-width:768px){
+  .tiers{grid-template-columns:1fr}
+  .footer{justify-content:center;text-align:center}
+  .footer-links{justify-content:center;width:100%}
+}
+</style>
+</head>
+<body>
+
+<header class="nav-wrap" role="banner">
+  <nav class="nav" aria-label="Primary">
+    <a href="#" class="nav-logo"><img src="./logo.png" alt="Designed By Jake"></a>
+    <div class="nav-links">
+      <a href="#features" class="hide-mobile">Features</a>
+      <a href="#pricing" class="hide-mobile">Pricing</a>
+      <a href="#contact" class="nav-cta">Book a call</a>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="hero-bg" aria-hidden="true">
+    <div class="hero-gradient-blob" id="hero-gradient-stage">
+      <canvas id="gradient-canvas-hero" class="stripe-gradient-canvas"></canvas>
+    </div>
+    <div class="hero-bg-scrim"></div>
+  </div>
+  <div class="container">
+    <h1>Never miss a patient <span class="dim">again.</span></h1>
+    <p>Your practice misses 30% of inbound calls. Each lost patient is worth $3,000+. This system answers every question, books appointments, and generates reviews. 24/7, while you sleep.</p>
+    <div class="hero-ctas">
+      <a href="#contact" class="btn-primary">Get started <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
+      <a href="#features" class="btn-ghost">See how it works <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14"/><path d="M19 12l-7 7-7-7"/></svg></a>
+    </div>
+  </div>
+</section>
+
+<section class="bento-section" id="features">
+  <div class="bento-bg" aria-hidden="true">
+    <div class="bento-gradient-blob" id="bento-gradient-stage">
+      <canvas id="gradient-canvas-bento" class="stripe-gradient-canvas"></canvas>
+    </div>
+    <div class="bento-bg-scrim"></div>
+  </div>
+  <div class="bento-section-inner">
+  <div class="bento-header fade-in">
+    <div class="section-label">Everything your practice needs</div>
+    <h2>One system. Six problems solved.</h2>
+    <p>Each piece works together to fill your schedule without adding staff.</p>
+  </div>
+  <div class="bento fade-in">
+
+    <div class="bento-card card-chatbot">
+      <button type="button" class="bento-card-expand" aria-expanded="false" aria-controls="more-chatbot" id="expand-chatbot" aria-label="More about AI receptionist">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="card-text">
+        <div class="card-icon" style="background:var(--accent-light)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h3>24/7 AI Receptionist</h3>
+        <p class="card-desc">Patients get instant, accurate answers about insurance, pricing, and hours. At 2am on a Sunday, during lunch, on holidays. No hold music, no voicemail, no lost revenue.</p>
+      </div>
+      <div class="card-img">
+        <video
+          id="feature-chatbot-demo"
+          src="./scheduling-insurance-demo.mp4"
+          muted
+          playsinline
+          loop
+          controls
+          preload="metadata"
+          aria-label="Demo: scheduling a dental appointment with insurance verification in the AI chat"
+        ></video>
+      </div>
+      <div class="bento-card-more" id="more-chatbot" role="region" aria-labelledby="expand-chatbot" aria-hidden="true">
+        <p>Your branding, your voice, your site. Every conversation is logged so your team sees exactly what patients are asking and can jump in with one click when a human touch is needed.</p>
+      </div>
+    </div>
+
+    <div class="bento-card card-booking">
+      <button type="button" class="bento-card-expand" aria-expanded="false" aria-controls="more-booking" id="expand-booking" aria-label="More about smart booking">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="card-icon" style="background:#dbeafe">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      </div>
+      <h3>Smart Booking</h3>
+      <p class="card-desc">Patients pick a time and book without calling, waiting on hold, or playing phone tag. Your schedule fills while your staff focuses on the patients already in the chair.</p>
+      <div class="mock-cal">
+        <div class="mock-cal-header">Tue, April 14 <span>Dr. Chen</span></div>
+        <div class="mock-cal-grid">
+          <div class="mock-cal-slot taken">9:00</div>
+          <div class="mock-cal-slot">9:30</div>
+          <div class="mock-cal-slot active">10:00</div>
+          <div class="mock-cal-slot">10:30</div>
+          <div class="mock-cal-slot taken">11:00</div>
+          <div class="mock-cal-slot taken">11:30</div>
+          <div class="mock-cal-slot">1:00</div>
+          <div class="mock-cal-slot">1:30</div>
+          <div class="mock-cal-slot taken">2:00</div>
+          <div class="mock-cal-slot">2:30</div>
+        </div>
+        <div class="mock-cal-patient"><span class="dot"></span>Sarah M. booked — Cleaning, 10:00 AM</div>
+      </div>
+      <div class="bento-card-more" id="more-booking" role="region" aria-labelledby="expand-booking" aria-hidden="true">
+        <p>Connects to the tools you already use. Respects provider hours, operatory blocks, and hygiene vs. doctor columns so you never get double-booked and patients always see the right person.</p>
+      </div>
+    </div>
+
+    <div class="bento-card card-reviews">
+      <button type="button" class="bento-card-expand" aria-expanded="false" aria-controls="more-reviews" id="expand-reviews" aria-label="More about review generation">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="card-icon" style="background:#fef3c7">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      </div>
+      <h3>Review Generation</h3>
+      <p class="card-desc">Happy patients leave without reviewing. This system follows up at the right moment so your Google rating climbs every month and you outrank competitors in local search.</p>
+      <div class="mock-reviews">
+        <div class="review-stats"><span class="review-num">4.8</span><span class="review-change">+81 new</span></div>
+        <div class="review-stars">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <span style="font-size:12px;color:var(--text-dim);margin-left:4px">128 reviews</span>
+        </div>
+        <div class="review-bar-group">
+          <div class="review-bar-row"><span>5</span><div class="review-bar"><div class="review-bar-fill" style="width:82%"></div></div></div>
+          <div class="review-bar-row"><span>4</span><div class="review-bar"><div class="review-bar-fill" style="width:12%"></div></div></div>
+          <div class="review-bar-row"><span>3</span><div class="review-bar"><div class="review-bar-fill" style="width:4%"></div></div></div>
+          <div class="review-bar-row"><span>2</span><div class="review-bar"><div class="review-bar-fill" style="width:1%"></div></div></div>
+          <div class="review-bar-row"><span>1</span><div class="review-bar"><div class="review-bar-fill" style="width:1%"></div></div></div>
+        </div>
+        <div class="review-card"><strong>Maria L. — 2 hours ago</strong>"Seamless experience. Booked online, filled out forms before I arrived, and was seen on time."</div>
+      </div>
+      <div class="bento-card-more" id="more-reviews" role="region" aria-labelledby="expand-reviews" aria-hidden="true">
+        <p>You choose when to ask. After a great visit, after treatment. The messages are polite, timed, and compliant. Practices using this go from 47 reviews to 150+ in 90 days.</p>
+      </div>
+    </div>
+
+    <div class="bento-card card-leads">
+      <button type="button" class="bento-card-expand" aria-expanded="false" aria-controls="more-leads" id="expand-leads" aria-label="More about lead alerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="card-icon" style="background:var(--green-light)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      </div>
+      <h3>Lead Alerts</h3>
+      <p class="card-desc">No more checking the inbox hoping you didn't miss someone. Every inquiry hits your phone in seconds with a plain-English summary and what to do next.</p>
+      <div class="mock-lead">
+        <div class="lead-notif">
+          <div class="lead-icon sms"><svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="lead-body">
+            <div class="lead-title">New patient inquiry</div>
+            <div class="lead-text">Sarah M. asked about teeth whitening and wants to schedule a consultation.</div>
+            <div class="lead-time">Just now · Score: 9/10</div>
+          </div>
+        </div>
+        <div class="lead-notif">
+          <div class="lead-icon email"><svg viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+          <div class="lead-body">
+            <div class="lead-title">Follow-up needed</div>
+            <div class="lead-text">James R. asked about Invisalign pricing but didn't book.</div>
+            <div class="lead-time">12 min ago · Score: 7/10</div>
+          </div>
+        </div>
+        <div class="lead-notif">
+          <div class="lead-icon confirm"><svg viewBox="0 0 24 24" fill="none" stroke="var(--green)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="lead-body">
+            <div class="lead-title">Appointment confirmed</div>
+            <div class="lead-text">Lisa K. booked a cleaning for Thursday 2:30 PM.</div>
+            <div class="lead-time">34 min ago</div>
+          </div>
+        </div>
+      </div>
+      <div class="bento-card-more" id="more-leads" role="region" aria-labelledby="expand-leads" aria-hidden="true">
+        <p>High-intent inquiries get flagged so your team responds in minutes, not hours. The difference between a patient who books and one who calls someone else is response time. This closes that gap.</p>
+      </div>
+    </div>
+
+    <div class="bento-card card-intake">
+      <button type="button" class="bento-card-expand" aria-expanded="false" aria-controls="more-intake" id="expand-intake" aria-label="More about AI patient intake">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+      </button>
+      <div class="card-icon" style="background:#f3e8ff">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#a855f7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      </div>
+      <h3>AI Patient Intake</h3>
+      <p class="card-desc">New patients show up with paperwork done. No clipboards, no waiting room delays, no chasing missing info. Your staff starts the appointment, not the admin.</p>
+      <div class="mock-intake">
+        <div class="intake-chat">
+          <div class="intake-msg bot">Hi! Let's get you set up before your visit. What's your full name?</div>
+          <div class="intake-msg user">Sarah Mitchell</div>
+          <div class="intake-msg bot">Thanks, Sarah! Do you have dental insurance? If so, who's your provider?</div>
+          <div class="intake-msg user">Yes — Delta Dental PPO</div>
+          <div class="intake-msg bot">Got it. Any allergies or medications we should know about?</div>
+        </div>
+        <div class="intake-progress">
+          <h4>Progress</h4>
+          <div class="intake-step"><span class="check done">✓</span> Name</div>
+          <div class="intake-step"><span class="check done">✓</span> Contact</div>
+          <div class="intake-step"><span class="check done">✓</span> Insurance</div>
+          <div class="intake-step"><span class="check current">4</span> Medical</div>
+          <div class="intake-step"><span class="check pending"></span> History</div>
+          <div class="intake-step"><span class="check pending"></span> Consent</div>
+        </div>
+      </div>
+      <div class="bento-card-more" id="more-intake" role="region" aria-labelledby="expand-intake" aria-hidden="true">
+        <p>Patients complete everything on their phone in under five minutes. Insurance info is validated, medical red flags are caught early, and your front desk saves 15 minutes per new patient.</p>
+      </div>
+    </div>
+
+  </div>
+  </div>
+</section>
+
+<section class="testimonials" id="testimonials">
+  <div class="container fade-in">
+    <div class="testimonials-head">
+      <div class="section-label">Working with Jake</div>
+      <h2>What people say</h2>
+    </div>
+    <div class="testimonials-stack">
+      <blockquote class="testimonial-quote" data-testimonial>
+        <p>Incredibly easy to reach and consistently ahead of schedule. Within just a week of the new site going live, the feedback has been overwhelmingly positive.</p>
+        <cite>&mdash; Justin Brown, Wildlife Biologist at Henrys Fork Wildlife Alliance</cite>
+      </blockquote>
+      <blockquote class="testimonial-quote" data-testimonial>
+        <p>He has a unique talent for simplifying complex processes and provides a quick turnaround without sacrificing quality. An invaluable asset to our organization.</p>
+        <cite>&mdash; Rosa Ines Aristy, Founder of Bridges to Science</cite>
+      </blockquote>
+    </div>
+  </div>
+</section>
+
+<section class="math-section">
+  <div class="container fade-in">
+    <h2>This system pays for itself with one patient.</h2>
+    <div class="math-variants">
+      <div class="math-variant">
+        <div class="math-rows">
+          <div class="math-row">
+            <div class="math-value">30%</div>
+            <p class="math-copy">of inbound calls go unanswered at the average practice</p>
+          </div>
+          <div class="math-row">
+            <div class="math-value">$3,000+</div>
+            <p class="math-copy">lifetime value of each new patient you lose</p>
+          </div>
+          <div class="math-row">
+            <div class="math-value">$15K+</div>
+            <p class="math-copy">in new revenue if this system captures just 5 extra patients a month</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="sub" style="margin-top:32px;max-width:100%">The average Boston dental practice generates $1.2M to $1.5M in annual revenue. Your monthly retainer is less than 0.1% of that. It pays for itself the first time a patient books at midnight instead of calling your competitor.</p>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="container fade-in">
+    <div class="section-label">Pricing</div>
+    <h2>Costs less than your least productive employee.</h2>
+    <p class="sub">No long-term contracts. No hidden fees. Cancel anytime.</p>
+    <div class="tiers">
+      <div class="tier">
+        <h3>AI Receptionist</h3>
+        <p class="desc">For practices with an existing website</p>
+        <div class="price">$1,500 <span>setup</span></div>
+        <p class="recur">then $400/month</p>
+        <ul>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>24/7 AI chatbot on your current site</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Trained on your practice's info</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>AI patient intake forms</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Automated review generation</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Lead notifications</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Live in 7 days</li>
+        </ul>
+        <a href="#contact" class="tier-btn">Get started</a>
+      </div>
+      <div class="tier featured">
+        <h3>Full System</h3>
+        <p class="desc">Website + AI + all automations</p>
+        <div class="price">$4,500 <span>setup</span></div>
+        <p class="recur">then $650/month</p>
+        <ul>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Everything in AI Receptionist</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Custom-designed practice website</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Appointment booking integration</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Monthly performance dashboard</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Priority support & optimization</li>
+          <li><svg class="ck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Live in 14 days</li>
+        </ul>
+        <a href="#contact" class="tier-btn">Get started</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="guarantee">
+  <div class="container fade-in">
+    <div class="section-label">Zero-risk guarantee</div>
+    <h2>30 days. Love it or get every dollar back.</h2>
+    <p>If you don't think the system is worth every penny after 30 days, I'll pull it off your site, refund your entire setup fee, and we part ways. You keep everything I built. I eat the loss.</p>
+  </div>
+</section>
+
+<section class="final-cta" id="contact">
+  <div class="container fade-in">
+    <h2>Every hour without this, patients are calling someone else.</h2>
+    <p>I take on 3 new practices per month. See it work on a demo version of your site. No commitment, no pitch. If it makes sense, we go from there.</p>
+    <a href="https://cal.com/designedbyjake" class="btn-primary">Book a free walkthrough <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg></a>
+    <a href="mailto:designedbyjake.co@gmail.com" class="btn-ghost">Or just ask a question</a>
+  </div>
+</section>
+
+<footer class="footer">
+  <p>&copy; 2026 Designed By Jake &middot; Boston, MA</p>
+  <div class="footer-links">
+    <a href="mailto:designedbyjake.co@gmail.com">designedbyjake.co@gmail.com</a>
+    <a href="https://www.linkedin.com/in/jake-cochran/" class="footer-li" target="_blank" rel="noopener noreferrer" aria-label="Jake Cochran on LinkedIn">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+    </a>
+  </div>
+</footer>
+
+<script>
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); }});
+}, { threshold: 0.1 });
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+/**
+ * Stripe-style feature cards: one expanded panel at a time; updates aria for assistive tech.
+ */
+document.querySelectorAll('.bento-card-expand').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const card = btn.closest('.bento-card');
+    if (!card) return;
+    const willOpen = !card.classList.contains('is-expanded');
+    document.querySelectorAll('.bento-card').forEach(c => {
+      if (c === card) return;
+      c.classList.remove('is-expanded');
+      const ob = c.querySelector('.bento-card-expand');
+      const op = c.querySelector('.bento-card-more');
+      if (ob) ob.setAttribute('aria-expanded', 'false');
+      if (op) op.setAttribute('aria-hidden', 'true');
+    });
+    card.classList.toggle('is-expanded', willOpen);
+    btn.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    const panel = card.querySelector('.bento-card-more');
+    if (panel) panel.setAttribute('aria-hidden', willOpen ? 'false' : 'true');
+  });
+});
+
+/**
+ * Wrap testimonial text characters so color transitions can happen per-character.
+ */
+function splitTestimonialText() {
+  document.querySelectorAll('[data-testimonial] p, [data-testimonial] cite').forEach((el) => {
+    if (el.dataset.splitChars === 'true') return;
+    const text = el.textContent || '';
+    const frag = document.createDocumentFragment();
+    for (const ch of text) {
+      if (ch === ' ') {
+        frag.appendChild(document.createTextNode(' '));
+        continue;
+      }
+      const span = document.createElement('span');
+      span.className = 'testimonial-char';
+      span.textContent = ch;
+      frag.appendChild(span);
+    }
+    el.textContent = '';
+    el.appendChild(frag);
+    el.dataset.splitChars = 'true';
+  });
+}
+
+/**
+ * Testimonials: after the reader scrolls past a quote (its midpoint above the viewport top),
+ * the quote and attribution ease to the accent blue.
+ */
+function updateTestimonialPastState() {
+  document.querySelectorAll('[data-testimonial]').forEach((el) => {
+    const r = el.getBoundingClientRect();
+    const triggerY = window.innerHeight * 0.62;
+    const quoteMidY = r.top + r.height * 0.45;
+    el.classList.toggle('testimonial-quote--past', quoteMidY < triggerY);
+  });
+}
+window.addEventListener('scroll', updateTestimonialPastState, { passive: true });
+window.addEventListener('resize', updateTestimonialPastState);
+splitTestimonialText();
+updateTestimonialPastState();
+
+/**
+ * Feature demo video: play only once the card media is scrolled into view; pause when off-screen.
+ * Muted + programmatic play satisfies autoplay policies; viewer can unmute via native controls.
+ */
+(function setupFeatureDemoVideo() {
+  const video = document.getElementById('feature-chatbot-demo');
+  if (!video || !('IntersectionObserver' in window)) return;
+  let hasStarted = false;
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          video.play().catch(() => {});
+          hasStarted = true;
+        } else if (hasStarted) {
+          video.pause();
+        }
+      });
+    },
+    { threshold: 0.35, rootMargin: '0px 0px -8% 0px' }
+  );
+  io.observe(video);
+})();
+</script>
+<script type="module">
+/**
+ * Stripe-style WebGL mesh (stripe-gradient). Blob layout uses CSS masks on a stage;
+ * we replace resize() so buffer size matches each stage (library defaults to window width).
+ */
+import * as StripeGradient from 'https://esm.sh/stripe-gradient@1.0.1';
+const mod = StripeGradient.default ?? StripeGradient;
+const Gradient = mod.Gradient;
+
+function installBlobResize(gradient, stageEl) {
+  gradient.resize = function blobResize() {
+    const w = Math.max(1, Math.round(stageEl.offsetWidth || 1));
+    const h = Math.max(1, Math.round(stageEl.offsetHeight || 1));
+    this.width = w;
+    this.height = h;
+    if (!this.minigl || !this.mesh) return;
+    this.minigl.setSize(this.width, this.height);
+    this.minigl.setOrthographicCamera();
+    this.xSegCount = Math.ceil(this.width * this.conf.density[0]);
+    this.ySegCount = Math.ceil(this.height * this.conf.density[1]);
+    this.mesh.geometry.setTopology(this.xSegCount, this.ySegCount);
+    this.mesh.geometry.setSize(this.width, this.height);
+    this.mesh.material.uniforms.u_shadow_power.value = this.width < 600 ? 5 : 6;
+  };
+}
+
+function mountBlobGradient(canvasSelector, stageEl) {
+  if (typeof Gradient !== 'function' || !stageEl) return;
+  const canvas = document.querySelector(canvasSelector);
+  if (!canvas) return;
+  const gradient = new Gradient();
+  gradient.height = Math.max(stageEl.offsetHeight, 1);
+  installBlobResize(gradient, stageEl);
+  gradient.initGradient(canvasSelector);
+  const reflow = () => {
+    if (gradient.minigl) gradient.resize();
+  };
+  window.addEventListener('resize', reflow);
+  if ('ResizeObserver' in window) new ResizeObserver(reflow).observe(stageEl);
+}
+
+mountBlobGradient('#gradient-canvas-hero', document.getElementById('hero-gradient-stage'));
+mountBlobGradient('#gradient-canvas-bento', document.getElementById('bento-gradient-stage'));
+</script>
+</body>
+</html>
